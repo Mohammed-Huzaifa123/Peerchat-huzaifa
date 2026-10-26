@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PeerCare – Peer Mental Health Support System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mint: #e6f4ec;
+  --mint-deep: #cfe9da;
+  --green: #17503a;
+  --ink: #0f2c20;
+  --accent: #2f8f66;
+  --line: #d3e4da;
+  --white: #fff;
+  --danger: #b3261e;
+  --radius: 18px;
+  --shadow: 0 6px 20px rgba(23, 80, 58, 0.09);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Figtree", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--mint);
+  line-height: 1.6;
+}
+h1, h2, h3, .logo { font-family: "Fraunces", Georgia, serif; color: var(--green); line-height: 1.2; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin: 0 0 0.6rem; }
+h2 { font-size: 1.4rem; margin: 1.5rem 0 0.6rem; }
+h3 { font-size: 1.15rem; margin: 0.4rem 0; }
+a { color: var(--accent); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.skip { position: absolute; left: -999px; background: var(--white); padding: 0.5rem 1rem; }
+.skip:focus { left: 1rem; top: 1rem; z-index: 99; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 5vw;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+}
+.logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.4rem; font-weight: 700; text-decoration: none; }
+.logo-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--green); color: var(--white); font-size: 1rem; }
+#mainNav { display: flex; align-items: center; gap: 1.4rem; }
+#mainNav a:not(.btn) { color: var(--green); text-decoration: none; font-weight: 500; }
+#mainNav a:not(.btn):hover { text-decoration: underline; }
+.menu-btn { display: none; border: 0; background: none; font-size: 1.6rem; color: var(--green); cursor: pointer; }
+
+main { min-height: 70vh; }
+.page { padding: 2.5rem 5vw; max-width: 1100px; margin: 0 auto; }
+.page.narrow { max-width: 520px; }
+
+.btn {
+  display: inline-block; border: 2px solid var(--green); border-radius: 999px;
+  background: var(--green); color: var(--white);
+  padding: 0.65rem 1.4rem; font: inherit; font-weight: 600;
+  text-decoration: none; cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.btn:hover { background: var(--accent); border-color: var(--accent); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+.btn.ghost { background: transparent; color: var(--green); }
+.btn.ghost:hover { background: var(--mint-deep); border-color: var(--green); }
+.btn.small { padding: 0.35rem 1rem; }
+.row { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 1.4rem 0 0.8rem; }
+.link-btn { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 0.4rem; }
+
+.hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 3rem; align-items: center; padding: 1rem 0 2rem; }
+.lead { font-size: 1.15rem; max-width: 56ch; }
+.hero-card { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); display: grid; gap: 0.8rem; }
+.bubble { margin: 0; padding: 0.8rem 1rem; border-radius: 16px 16px 16px 4px; background: var(--mint); max-width: 90%; }
+.bubble.reply { justify-self: end; border-radius: 16px 16px 4px 16px; background: var(--green); color: var(--white); }
+.band { background: var(--white); border-radius: var(--radius); padding: 1.6rem 2rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+.band h2 { margin-top: 0; }
+.band p { max-width: 70ch; margin-bottom: 0; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin: 1.2rem 0; }
+.card { background: var(--white); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
+.card p { margin: 0.3rem 0 0.6rem; }
+.link-card { display: block; color: inherit; text-decoration: none; }
+.link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(23, 80, 58, 0.15); }
+.ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--mint-deep); font-size: 1.3rem; }
+.big { font-family: "Fraunces", Georgia, serif; font-size: 2.4rem; color: var(--green); margin: 0; }
+.tag { display: inline-block; background: var(--mint-deep); color: var(--green); border-radius: 999px; padding: 0.1rem 0.7rem; font-size: 0.85rem; font-weight: 600; }
+
+.panel { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); margin: 1rem 0; }
+label { display: block; font-weight: 600; margin: 0.9rem 0 0.3rem; }
+input, select, textarea {
+  width: 100%; padding: 0.7rem 0.9rem; font: inherit; color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 12px; background: var(--white);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--mint-deep); }
+input.bad, textarea.bad, select.bad { border-color: var(--danger); }
+.panel .btn { margin-top: 1rem; }
+.pw { display: flex; gap: 0.4rem; align-items: center; }
+.err { color: var(--danger); font-size: 0.9rem; margin: 0.25rem 0 0; min-height: 0; }
+.hint, .note { font-size: 0.9rem; color: #46665a; margin: 0.3rem 0; }
+.msg { margin: 0.8rem 0 0; font-weight: 600; }
+.msg.ok { color: var(--accent); }
+.msg.bad { color: var(--danger); }
+.banner { background: #fff6dc; border-left: 5px solid #e0b43a; padding: 0.8rem 1rem; border-radius: 10px; margin: 0.8rem 0; }
+
+.app { display: grid; grid-template-columns: 240px 1fr; max-width: 1300px; margin: 0 auto; }
+.side { display: flex; flex-direction: column; gap: 0.3rem; padding: 2rem 1rem; position: sticky; top: 64px; align-self: start; }
+.side a { padding: 0.65rem 1rem; border-radius: 12px; color: var(--green); text-decoration: none; font-weight: 500; transition: background 0.2s; }
+.side a:hover { background: var(--mint-deep); }
+.side a.active { background: var(--green); color: var(--white); }
+.side .link-btn { text-align: left; padding: 0.65rem 1rem; }
+.content .page { margin: 0; max-width: none; }
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.two h2 { margin-top: 0; }
+dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1rem; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+.plain { list-style: none; padding: 0; margin: 0; }
+.plain li { padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+.plain li small { display: block; color: #46665a; }
+.empty { background: var(--white); border: 2px dashed var(--mint-deep); border-radius: var(--radius); padding: 1.2rem; text-align: center; color: #46665a; }
+
+.filters { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 0.5rem; }
+.filters label { margin-top: 0; }
+.post { background: var(--white); border-radius: var(--radius); padding: 1rem 1.3rem; box-shadow: var(--shadow); margin: 0.8rem 0; display: flex; justify-content: space-between; gap: 1rem; }
+.post p { margin: 0 0 0.2rem; overflow-wrap: anywhere; }
+.post small { color: #46665a; }
+.post .link-btn { color: var(--danger); align-self: start; }
+
+.table-wrap { overflow-x: auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; min-width: 420px; }
+th, td { text-align: left; padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--line); }
+th { color: var(--green); background: var(--mint-deep); }
+
+.footer { text-align: center; padding: 2rem 5vw; background: var(--green); color: var(--mint); }
+.footer p { margin: 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 140%);
+  background: var(--green); color: var(--white);
+  padding: 0.8rem 1.4rem; border-radius: 999px; box-shadow: var(--shadow);
+  transition: transform 0.3s; max-width: 90vw; z-index: 50;
+}
+.toast.show { transform: translate(-50%, 0); }
+
+@media (max-width: 860px) {
+  .hero, .two, .filters { grid-template-columns: 1fr; }
+  .app { grid-template-columns: 1fr; }
+  .side { flex-direction: row; flex-wrap: wrap; position: static; padding: 1rem 5vw 0; }
+  .menu-btn { display: block; }
+  #mainNav {
+    display: none; position: absolute; left: 0; right: 0; top: 100%;
+    flex-direction: column; align-items: flex-start; gap: 0.8rem;
+    background: var(--white); padding: 1rem 5vw; border-bottom: 1px solid var(--line);
+  }
+  #mainNav.open { display: flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="logo" href="#home"><span class="logo-mark" aria-hidden="true">♡</span>PeerCare</a>
+  <button id="menuBtn" class="menu-btn" aria-expanded="false" aria-controls="mainNav" aria-label="Toggle menu">☰</button>
+  <nav id="mainNav" aria-label="Main">
+    <a href="#home">Home</a>
+    <a href="#services">Services</a>
+    <a href="#register">Register</a>
+    <a href="#login">Login</a>
+    <a href="#dashboard" class="btn small">Dashboard</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="page" id="home">
+    <div class="hero">
+      <div>
+        <h1>Someone your own age understands what this week feels like.</h1>
+        <p class="lead">PeerCare is a student project that shows how peer mental health support could work on campus: find a peer, share in a forum, read wellness guides and request a counselling slot.</p>
+        <div class="row">
+          <a class="btn" href="#register">Get started</a>
+          <a class="btn ghost" href="#services">Explore services</a>
+        </div>
+        <p class="note">Demonstration project. No real peers or professionals are connected.</p>
+      </div>
+      <div class="hero-card" aria-hidden="true">
+        <p class="bubble">Exams are stacking up and I can't switch off.</p>
+        <p class="bubble reply">Same here last term. A 20-minute walk between sessions helped me. Want to talk it through?</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <h2>What is peer mental health support?</h2>
+      <p>Peer support means students listening to students. It is not therapy and it does not replace professional care. It gives people a place to feel heard, trade coping ideas and find the next right step, including reaching out to a counsellor.</p>
+    </div>
+
+    <div id="features" class="grid">
+      <article class="card"><span class="ico" aria-hidden="true">🤝</span><h3>Peer Support</h3><p>Browse sample peer profiles and send a demo support request.</p><a href="#peers">Find a peer</a></article>
+      <article class="card"><span class="ico" aria-hidden="true">💬</span><h3>Community Forum</h3><p>Write posts and reply in a local-only demo forum.</p><a href="#forum">Open forum</a></article>
+      <article class="card"><span class="ico" aria-hidden="true">📚</span><h3>Wellness Resources</h3><p>Practical guides on stress, study balance and asking for help.</p><a href="#resources">Read guides</a></article>
+      <article class="card"><span class="ico" aria-hidden="true">📅</span><h3>Appointments</h3><p>Request a preferred date and time. Demo confirmation only.</p><a href="#appointments">Request a slot</a></article>
+    </div>
+  </section>
+
+  <section class="page narrow" id="register" hidden>
+    <h1>Create your account</h1>
+    <p class="note">Demo registration. Your name and email stay in this browser only. Your password is checked and then discarded, never saved.</p>
+    <form id="registerForm" class="panel" novalidate>
+      <label for="regName">Student name</label>
+      <input id="regName" type="text" autocomplete="name">
+      <p class="err" id="regNameErr" role="alert"></p>
+      <label for="regEmail">Email</label>
+      <input id="regEmail" type="email" autocomplete="email">
+      <p class="err" id="regEmailErr" role="alert"></p>
+      <label for="regPass">Password</label>
+      <input id="regPass" type="password" autocomplete="new-password">
+      <p class="hint">At least 8 characters with a letter and a number.</p>
+      <p class="err" id="regPassErr" role="alert"></p>
+      <label for="regConfirm">Confirm password</label>
+      <input id="regConfirm" type="password" autocomplete="new-password">
+      <p class="err" id="regConfirmErr" role="alert"></p>
+      <button class="btn" type="submit">Create account</button>
+      <p class="msg" id="registerMsg" role="status"></p>
+    </form>
+    <p>Already registered? <a href="#login">Log in</a></p>
+  </section>
+
+  <section class="page narrow" id="login" hidden>
+    <h1>Log in</h1>
+    <p class="banner">Demonstration login. There is no authentication server, so any valid email and an 8+ character password will open the demo dashboard. Do not use a real password.</p>
+    <form id="loginForm" class="panel" novalidate>
+      <label for="logEmail">Email</label>
+      <input id="logEmail" type="email" autocomplete="email">
+      <p class="err" id="logEmailErr" role="alert"></p>
+      <label for="logPass">Password</label>
+      <div class="pw">
+        <input id="logPass" type="password" autocomplete="current-password">
+        <button type="button" id="togglePass" class="link-btn" aria-pressed="false">Show</button>
+      </div>
+      <p class="err" id="logPassErr" role="alert"></p>
+      <button class="btn" type="submit">Log in</button>
+      <p class="msg" id="loginMsg" role="status"></p>
+      <button class="btn ghost" type="button" id="googleBtn">Continue with Google (placeholder)</button>
+    </form>
+    <p>New here? <a href="#register">Create an account</a></p>
+  </section>
+
+  <div class="app" id="app" hidden>
+    <aside class="side" aria-label="Student navigation">
+      <a href="#dashboard" data-nav="dashboard">🏠 Dashboard</a>
+      <a href="#peers" data-nav="peers">🤝 Peer Support</a>
+      <a href="#forum" data-nav="forum">💬 Community Forum</a>
+      <a href="#resources" data-nav="resources">📚 Resources</a>
+      <a href="#appointments" data-nav="appointments">📅 Appointments</a>
+      <a href="#admin" data-nav="admin">🛠 Admin (demo)</a>
+      <button class="link-btn" id="logoutBtn" type="button">Log out</button>
+    </aside>
+
+    <div class="content">
+
+      <section class="page" id="dashboard" hidden>
+        <h1>Welcome, <span id="welcomeName">friend</span></h1>
+        <p class="note">Demo dashboard. Everything here is sample or local data.</p>
+        <div class="grid">
+          <a class="card link-card" href="#peers"><span class="ico" aria-hidden="true">🤝</span><h3>Peer Support</h3><p>6 sample peers</p></a>
+          <a class="card link-card" href="#forum"><span class="ico" aria-hidden="true">💬</span><h3>Community Forum</h3><p><span id="postCount">0</span> local posts</p></a>
+          <a class="card link-card" href="#resources"><span class="ico" aria-hidden="true">📚</span><h3>Wellness Resources</h3><p>4 guides</p></a>
+          <a class="card link-card" href="#appointments"><span class="ico" aria-hidden="true">📅</span><h3>Appointments</h3><p><span id="apptCount">0</span> demo requests</p></a>
+        </div>
+        <div class="two">
+          <div class="panel"><h2>Profile summary</h2>
+            <dl><dt>Name</dt><dd id="profName">Guest</dd><dt>Email</dt><dd id="profEmail">Not signed in</dd><dt>Account type</dt><dd>Demo student</dd></dl>
+          </div>
+          <div class="panel"><h2>Recent activity</h2>
+            <ul id="activityList" class="plain"></ul>
+            <p class="empty" id="activityEmpty">Nothing yet. Send a support request or write a forum post and it will show up here.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="peers" hidden>
+        <h1>Peer support</h1>
+        <p class="banner">All profiles are fictional demonstration data. Sending a request does not contact a real person.</p>
+        <div class="filters">
+          <div><label for="peerSearch">Search by name or topic</label><input id="peerSearch" type="search"></div>
+          <div><label for="peerTopic">Topic</label>
+            <select id="peerTopic"><option value="all">All topics</option><option>Exam stress</option><option>Homesickness</option><option>Time management</option><option>Social anxiety</option></select>
+          </div>
+        </div>
+        <div class="grid" id="peerList"></div>
+        <p class="empty" id="peerEmpty" hidden>No peers match. Clear the search or choose All topics.</p>
+      </section>
+
+      <section class="page" id="forum" hidden>
+        <h1>Community forum</h1>
+        <p class="banner">Local demo only. Posts are saved in this browser, not on a server, and nobody else can see them. Do not write private or sensitive details.</p>
+        <form id="postForm" class="panel" novalidate>
+          <label for="postText">Share a thought</label>
+          <textarea id="postText" rows="3" maxlength="300"></textarea>
+          <p class="hint"><span id="charCount">0</span>/300</p>
+          <p class="err" id="postErr" role="alert"></p>
+          <button class="btn" type="submit">Publish post</button>
+        </form>
+        <div id="postList"></div>
+        <p class="empty" id="postEmpty">No posts yet. Be the first to share something.</p>
+      </section>
+
+      <section class="page" id="resources" hidden>
+        <h1>Wellness resources</h1>
+        <p class="banner">These guides are general information. They do not replace professional care. If you are in crisis, contact a local emergency number or a qualified counsellor.</p>
+        <div class="grid">
+          <article class="card"><h3>Managing stress</h3><p>Try box breathing: in for 4, hold 4, out 4, hold 4. Repeat for two minutes before studying or an exam. Short walks also help.</p></article>
+          <article class="card"><h3>Balancing study</h3><p>Study in 45-minute blocks with 10-minute breaks. Plan the hardest subject for your best energy hours and protect sleep.</p></article>
+          <article class="card"><h3>Emotional wellbeing</h3><p>Name what you feel in one sentence, keep one regular routine, and stay in touch with someone you trust each day.</p></article>
+          <article class="card"><h3>Asking for help</h3><p>Reaching out is a strength. Start with a friend, mentor or campus counsellor, and say what you need: listening, advice or a plan.</p></article>
+        </div>
+      </section>
+
+      <section class="page" id="appointments" hidden>
+        <h1>Request an appointment</h1>
+        <p class="banner">Demo only. Submitting this form does not book anything with a counsellor.</p>
+        <form id="apptForm" class="panel" novalidate>
+          <label for="apptDate">Preferred date</label>
+          <input id="apptDate" type="date">
+          <p class="err" id="apptDateErr" role="alert"></p>
+          <label for="apptTime">Preferred time</label>
+          <select id="apptTime"><option value="">Choose a time</option><option>09:00</option><option>11:00</option><option>14:00</option><option>16:00</option></select>
+          <p class="err" id="apptTimeErr" role="alert"></p>
+          <label for="apptType">Type of support</label>
+          <select id="apptType"><option>Counselling chat</option><option>Study stress</option><option>General check-in</option></select>
+          <button class="btn" type="submit">Request slot</button>
+          <p class="msg" id="apptMsg" role="status"></p>
+        </form>
+      </section>
+
+      <section class="page" id="admin" hidden>
+        <h1>Admin dashboard</h1>
+        <p class="banner">Sample data only. This is a mock-up with no real administrative access or secure authentication.</p>
+        <div class="grid">
+          <div class="card"><h3>Users</h3><p class="big">128</p></div>
+          <div class="card"><h3>Forum posts</h3><p class="big">342</p></div>
+          <div class="card"><h3>Support requests</h3><p class="big">57</p></div>
+        </div>
+        <h2>Recent users (sample)</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Joined</th></tr></thead>
+          <tbody>
+            <tr><td>Sample User A</td><td>user.a@example.com</td><td>2026-09-02</td></tr>
+            <tr><td>Sample User B</td><td>user.b@example.com</td><td>2026-09-11</td></tr>
+            <tr><td>Sample User C</td><td>user.c@example.com</td><td>2026-10-01</td></tr>
+          </tbody>
+        </table></div>
+        <h2>Support requests (sample)</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Topic</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr><td>Exam stress</td><td>Open</td><td>2026-10-20</td></tr>
+            <tr><td>Time management</td><td>Matched</td><td>2026-10-21</td></tr>
+            <tr><td>Homesickness</td><td>Closed</td><td>2026-10-22</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>PeerCare is a college demonstration project. It is not a medical service and does not replace professional care.</p>
+</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+const appPages = ["dashboard", "peers", "forum", "resources", "appointments", "admin"];
+const publicPages = ["home", "register", "login"];
+
+const store = {
+  get(key, fallback) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key));
+      return value === null ? fallback : value;
+    } catch {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      showToast("Could not save in this browser.");
+    }
+  }
+};
+
+const peers = [
+  { name: "Aarav (sample)", topic: "Exam stress", bio: "Third-year student. Likes planning revision with a friend." },
+  { name: "Meera (sample)", topic: "Homesickness", bio: "Moved cities for college and knows the first-month blues." },
+  { name: "Kabir (sample)", topic: "Time management", bio: "Balances labs, clubs and sleep with a weekly planner." },
+  { name: "Isha (sample)", topic: "Social anxiety", bio: "Happy to chat about easing into new groups at your pace." },
+  { name: "Nikhil (sample)", topic: "Exam stress", bio: "Final-year student, calm about last-minute revision." },
+  { name: "Zoya (sample)", topic: "Time management", bio: "Shares simple routines for deadline-heavy semesters." }
+];
+
+let toastTimer;
+function showToast(text) {
+  const toast = $("#toast");
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+function setError(id, text) {
+  const box = $("#" + id);
+  const field = $("#" + id.replace("Err", ""));
+  box.textContent = text;
+  if (field) field.classList.toggle("bad", Boolean(text));
+  return !text;
+}
+
+function setMessage(id, text, good) {
+  const box = $("#" + id);
+  box.textContent = text;
+  box.className = "msg " + (good ? "ok" : "bad");
+}
+
+function runWithLoading(button, label, action) {
+  const original = button.textContent;
+  button.disabled = true;
+  button.textContent = label;
+  setTimeout(() => {
+    button.disabled = false;
+    button.textContent = original;
+    action();
+  }, 700);
+}
+
+function validEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function addActivity(text) {
+  const list = store.get("pcActivity", []);
+  list.unshift({ text, time: new Date().toLocaleString() });
+  store.set("pcActivity", list.slice(0, 5));
+}
+
+function showPage(name) {
+  if (name === "services") {
+    showPage("home");
+    $("#features").scrollIntoView();
+    return;
+  }
+  if (![...publicPages, ...appPages].includes(name)) name = "home";
+  $("#app").hidden = !appPages.includes(name);
+  $$(".page").forEach((page) => {
+    page.hidden = page.id !== name;
+  });
+  $$("[data-nav]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.nav === name);
+  });
+  $("#mainNav").classList.remove("open");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+  if (name === "dashboard") renderDashboard();
+  if (name === "peers") renderPeers();
+  if (name === "forum") renderPosts();
+  window.scrollTo(0, 0);
+  document.title = "PeerCare – " + name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function route() {
+  showPage(location.hash.replace("#", "") || "home");
+}
+
+function renderDashboard() {
+  const user = store.get("pcUser", null);
+  $("#welcomeName").textContent = user ? user.name : "friend";
+  $("#profName").textContent = user ? user.name : "Guest";
+  $("#profEmail").textContent = user ? user.email : "Not signed in";
+  $("#postCount").textContent = store.get("pcPosts", []).length;
+  $("#apptCount").textContent = store.get("pcApptCount", 0);
+  const list = store.get("pcActivity", []);
+  $("#activityList").innerHTML = "";
+  list.forEach((item) => {
+    const row = document.createElement("li");
+    row.textContent = item.text;
+    const time = document.createElement("small");
+    time.textContent = item.time;
+    row.append(time);
+    $("#activityList").append(row);
+  });
+  $("#activityEmpty").hidden = list.length > 0;
+}
+
+function renderPeers() {
+  const term = $("#peerSearch").value.trim().toLowerCase();
+  const topic = $("#peerTopic").value;
+  const shown = peers.filter((peer) => {
+    const matchesTopic = topic === "all" || peer.topic === topic;
+    const matchesTerm = !term || (peer.name + " " + peer.topic).toLowerCase().includes(term);
+    return matchesTopic && matchesTerm;
+  });
+  const box = $("#peerList");
+  box.innerHTML = "";
+  shown.forEach((peer) => {
+    const card = document.createElement("article");
+    card.className = "card";
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = peer.topic;
+    const title = document.createElement("h3");
+    title.textContent = peer.name;
+    const bio = document.createElement("p");
+    bio.textContent = peer.bio;
+    const button = document.createElement("button");
+    button.className = "btn small";
+    button.textContent = "Request support";
+    button.addEventListener("click", () => {
+      runWithLoading(button, "Sending…", () => {
+        addActivity("Demo support request: " + peer.name);
+        showToast("Demo only: no real peer was contacted.");
+      });
+    });
+    card.append(tag, title, bio, button);
+    box.append(card);
+  });
+  $("#peerEmpty").hidden = shown.length > 0;
+}
+
+function renderPosts() {
+  const posts = store.get("pcPosts", []);
+  const box = $("#postList");
+  box.innerHTML = "";
+  posts.forEach((post) => {
+    const item = document.createElement("article");
+    item.className = "post";
+    const body = document.createElement("div");
+    const text = document.createElement("p");
+    text.textContent = post.text;
+    const time = document.createElement("small");
+    time.textContent = "You · " + post.time;
+    body.append(text, time);
+    const remove = document.createElement("button");
+    remove.className = "link-btn";
+    remove.textContent = "Delete";
+    remove.setAttribute("aria-label", "Delete this post");
+    remove.addEventListener("click", () => {
+      store.set("pcPosts", store.get("pcPosts", []).filter((entry) => entry.id !== post.id));
+      renderPosts();
+      showToast("Post deleted.");
+    });
+    item.append(body, remove);
+    box.append(item);
+  });
+  $("#postEmpty").hidden = posts.length > 0;
+}
+
+$("#menuBtn").addEventListener("click", () => {
+  const nav = $("#mainNav");
+  const open = nav.classList.toggle("open");
+  $("#menuBtn").setAttribute("aria-expanded", String(open));
+});
+
+$("#registerForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = $("#regName").value.trim();
+  const email = $("#regEmail").value.trim();
+  const pass = $("#regPass").value;
+  const confirm = $("#regConfirm").value;
+  const checks = [
+    setError("regNameErr", name.length < 2 ? "Enter your full name (at least 2 characters)." : ""),
+    setError("regEmailErr", validEmail(email) ? "" : "Enter a valid email such as name@college.edu."),
+    setError("regPassErr", pass.length >= 8 && /[A-Za-z]/.test(pass) && /\d/.test(pass) ? "" : "Use at least 8 characters with a letter and a number."),
+    setError("regConfirmErr", confirm === pass && confirm ? "" : "Passwords do not match.")
+  ];
+  if (checks.includes(false)) {
+    setMessage("registerMsg", "Fix the highlighted fields and try again.", false);
+    return;
+  }
+  runWithLoading($("#registerForm button[type=submit]"), "Creating…", () => {
+    store.set("pcUser", { name, email });
+    $("#registerForm").reset();
+    setMessage("registerMsg", "Demo account created. Redirecting to your dashboard…", true);
+    addActivity("Created a demo account");
+    setTimeout(() => {
+      setMessage("registerMsg", "", true);
+      location.hash = "#dashboard";
+    }, 900);
+  });
+});
+
+$("#loginForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const email = $("#logEmail").value.trim();
+  const pass = $("#logPass").value;
+  const checks = [
+    setError("logEmailErr", validEmail(email) ? "" : "Enter a valid email address."),
+    setError("logPassErr", pass.length >= 8 ? "" : "Password must be at least 8 characters.")
+  ];
+  if (checks.includes(false)) {
+    setMessage("loginMsg", "Check your details and try again.", false);
+    return;
+  }
+  runWithLoading($("#loginForm button[type=submit]"), "Logging in…", () => {
+    const saved = store.get("pcUser", null);
+    if (!saved || saved.email !== email) {
+      store.set("pcUser", { name: email.split("@")[0], email });
+    }
+    $("#loginForm").reset();
+    setMessage("loginMsg", "Demo login successful.", true);
+    addActivity("Logged in (demo)");
+    setTimeout(() => {
+      setMessage("loginMsg", "", true);
+      location.hash = "#dashboard";
+    }, 700);
+  });
+});
+
+$("#togglePass").addEventListener("click", () => {
+  const field = $("#logPass");
+  const show = field.type === "password";
+  field.type = show ? "text" : "password";
+  $("#togglePass").textContent = show ? "Hide" : "Show";
+  $("#togglePass").setAttribute("aria-pressed", String(show));
+});
+
+$("#googleBtn").addEventListener("click", () => {
+  setMessage("loginMsg", "Placeholder only. Real Google Sign-In needs an OAuth client ID and a secure backend to verify tokens, so it is not included in this frontend-only demo.", false);
+});
+
+$("#logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("pcUser");
+  showToast("Logged out of the demo.");
+  location.hash = "#home";
+});
+
+$("#peerSearch").addEventListener("input", renderPeers);
+$("#peerTopic").addEventListener("change", renderPeers);
+
+$("#postText").addEventListener("input", () => {
+  $("#charCount").textContent = $("#postText").value.length;
+});
+
+$("#postForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const text = $("#postText").value.trim();
+  if (!setError("postErr", text.length < 5 ? "Write at least 5 characters before publishing." : "")) return;
+  const posts = store.get("pcPosts", []);
+  posts.unshift({ id: Date.now(), text, time: new Date().toLocaleString() });
+  store.set("pcPosts", posts);
+  addActivity("Published a forum post");
+  $("#postText").value = "";
+  $("#charCount").textContent = "0";
+  renderPosts();
+  showToast("Post published locally.");
+});
+
+$("#apptDate").min = new Date().toISOString().split("T")[0];
+
+$("#apptForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const date = $("#apptDate").value;
+  const time = $("#apptTime").value;
+  const today = new Date().toISOString().split("T")[0];
+  const checks = [
+    setError("apptDateErr", !date ? "Choose a date." : date < today ? "Choose today or a future date." : ""),
+    setError("apptTimeErr", time ? "" : "Choose a time.")
+  ];
+  if (checks.includes(false)) {
+    setMessage("apptMsg", "Complete the form to continue.", false);
+    return;
+  }
+  runWithLoading($("#apptForm button[type=submit]"), "Sending…", () => {
+    store.set("pcApptCount", store.get("pcApptCount", 0) + 1);
+    addActivity("Demo appointment request: " + date + " at " + time);
+    setMessage("apptMsg", "Demo confirmation: your request for " + date + " at " + time + " was recorded in this browser only. No appointment was booked with a professional.", true);
+    $("#apptForm").reset();
+  });
+});
+
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
